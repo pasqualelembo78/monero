@@ -165,7 +165,7 @@
 
 #define RPC_IP_FAILS_BEFORE_BLOCK                       3
 
-#define CRYPTONOTE_NAME                         "bitmonero"
+#define CRYPTONOTE_NAME                         "MevaCoin"
 #define CRYPTONOTE_BLOCKCHAINDATA_FILENAME      "data.mdb"
 #define CRYPTONOTE_BLOCKCHAINDATA_LOCK_FILENAME "lock.mdb"
 #define P2P_NET_DATA_FILENAME                   "p2pstate.bin"
@@ -235,54 +235,61 @@ namespace config
   uint16_t const RPC_DEFAULT_PORT = 18081;
   uint16_t const ZMQ_RPC_DEFAULT_PORT = 18082;
   boost::uuids::uuid const NETWORK_ID = { {
-      0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x10
+      0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99
     } }; // Bender's nightmare
-  std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
+  std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302125fc635f8bfa8a40d2369704ddf914cc02aea88d4bb8af7cd1840dbc80c04a92101417d39b50624a496bfdf6a0c63f1901207cf37375f867d1a1a9681edceb6012e";
   uint32_t const GENESIS_NONCE = 10000;
-
-  // Hash domain separators
-  const char HASH_KEY_BULLETPROOF_EXPONENT[] = "bulletproof";
-  const char HASH_KEY_BULLETPROOF_PLUS_EXPONENT[] = "bulletproof_plus";
-  const char HASH_KEY_BULLETPROOF_PLUS_TRANSCRIPT[] = "bulletproof_plus_transcript";
-  const char HASH_KEY_RINGDB[] = "ringdsb";
-  const char HASH_KEY_SUBADDRESS[] = "SubAddr";
-  const unsigned char HASH_KEY_ENCRYPTED_PAYMENT_ID = 0x8d;
-  const unsigned char HASH_KEY_WALLET = 0x8c;
-  const unsigned char HASH_KEY_WALLET_CACHE = 0x8d;
-  const unsigned char HASH_KEY_BACKGROUND_CACHE = 0x8e;
-  const unsigned char HASH_KEY_BACKGROUND_KEYS_FILE = 0x8f;
-  const unsigned char HASH_KEY_RPC_PAYMENT_NONCE = 0x58;
-  const unsigned char HASH_KEY_MEMORY = 'k';
-  const unsigned char HASH_KEY_MULTISIG[] = {'M', 'u', 'l', 't' , 'i', 's', 'i', 'g', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-  const unsigned char HASH_KEY_MULTISIG_KEY_AGGREGATION[] = "Multisig_key_agg";
-  const unsigned char HASH_KEY_CLSAG_ROUND_MULTISIG[] = "CLSAG_round_ms_merge_factor";
-  const unsigned char HASH_KEY_TXPROOF_V2[] = "TXPROOF_V2";
-  const unsigned char HASH_KEY_CLSAG_ROUND[] = "CLSAG_round";
-  const unsigned char HASH_KEY_CLSAG_AGG_0[] = "CLSAG_agg_0";
-  const unsigned char HASH_KEY_CLSAG_AGG_1[] = "CLSAG_agg_1";
-  const char HASH_KEY_MESSAGE_SIGNING[] = "MoneroMessageSignature";
-  const unsigned char HASH_KEY_MM_SLOT = 'm';
-  const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS_SEED[] = "multisig_tx_privkeys_seed";
-  const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS[] = "multisig_tx_privkeys";
-  const constexpr char HASH_KEY_TXHASH_AND_MIXRING[] = "txhash_and_mixring";
+// Hash domain separators (prefisso meva_)
+const char HASH_KEY_BULLETPROOF_EXPONENT[] = "meva_bulletproof";
+const char HASH_KEY_BULLETPROOF_PLUS_EXPONENT[] = "meva_bulletproof_plus";
+const char HASH_KEY_BULLETPROOF_PLUS_TRANSCRIPT[] = "meva_bulletproof_plus_transcript";
+const char HASH_KEY_RINGDB[] = "meva_ringdsb";
+const char HASH_KEY_SUBADDRESS[] = "meva_SubAddr";
+const unsigned char HASH_KEY_ENCRYPTED_PAYMENT_ID = 0x8d;
+const unsigned char HASH_KEY_WALLET = 0x8c;
+const unsigned char HASH_KEY_WALLET_CACHE = 0x8d;
+const unsigned char HASH_KEY_BACKGROUND_CACHE = 0x8e;
+const unsigned char HASH_KEY_BACKGROUND_KEYS_FILE = 0x8f;
+const unsigned char HASH_KEY_RPC_PAYMENT_NONCE = 0x58;
+const unsigned char HASH_KEY_MEMORY = 'k';
+// 'meva_Multisig' padded with zeroes to match original array length (32 bytes)
+const unsigned char HASH_KEY_MULTISIG[] = {
+  'm','e','v','a','_','M','u','l','t','i','s','i','g',
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+};
+const unsigned char HASH_KEY_MULTISIG_KEY_AGGREGATION[] = "meva_Multisig_key_agg";
+const unsigned char HASH_KEY_CLSAG_ROUND_MULTISIG[] = "meva_CLSAG_round_ms_merge_factor";
+const unsigned char HASH_KEY_TXPROOF_V2[] = "meva_TXPROOF_V2";
+const unsigned char HASH_KEY_CLSAG_ROUND[] = "meva_CLSAG_round";
+const unsigned char HASH_KEY_CLSAG_AGG_0[] = "meva_CLSAG_agg_0";
+const unsigned char HASH_KEY_CLSAG_AGG_1[] = "meva_CLSAG_agg_1";
+const char HASH_KEY_MESSAGE_SIGNING[] = "meva_MevacoinMessageSignature";
+const unsigned char HASH_KEY_MM_SLOT = 'm';
+const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS_SEED[] = "meva_multisig_tx_privkeys_seed";
+const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS[] = "meva_multisig_tx_privkeys";
+const constexpr char HASH_KEY_TXHASH_AND_MIXRING[] = "meva_txhash_and_mixring";
 
   // Multisig
   const uint32_t MULTISIG_MAX_SIGNERS{16};
 
   namespace testnet
-  {
-    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;
-    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 54;
-    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
-    uint16_t const P2P_DEFAULT_PORT = 28080;
-    uint16_t const RPC_DEFAULT_PORT = 28081;
-    uint16_t const ZMQ_RPC_DEFAULT_PORT = 28082;
-    boost::uuids::uuid const NETWORK_ID = { {
-        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x11
-      } }; // Bender's daydream
-    std::string const GENESIS_TX = "013c01ff0001ffffffffffff03029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd08807121017767aafcde9be00dcfd098715ebcf7f410daebc582fda69d24a28e9d0bc890d1";
-    uint32_t const GENESIS_NONCE = 10001;
-  }
+{
+  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;
+  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 54;
+  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
+  uint16_t const P2P_DEFAULT_PORT = 28080;
+  uint16_t const RPC_DEFAULT_PORT = 28081;
+  uint16_t const ZMQ_RPC_DEFAULT_PORT = 28082;
+  boost::uuids::uuid const NETWORK_ID = { {
+      0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x11, 0x22,
+      0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA
+    } };
+  
+  // INSERISCI IL TUO GENESIS TX QUI
+  std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302c9653410fe03c7b136a1777e857b71693171733677b57f5fddae9ee1b77ec7502101beb93643458dfe7116701e141da83b3e73e83abd35d0aa2d1a65052481a6126c";
+  uint32_t const GENESIS_NONCE = 10001;  // NOTA: Usa 10001 come nei tuoi log!
+}
 
   namespace stagenet
   {
