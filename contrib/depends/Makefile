@@ -6,7 +6,7 @@ print-%: FORCE
 
 SOURCES_PATH ?= $(BASEDIR)/sources
 BASE_CACHE ?= $(BASEDIR)/built
-FALLBACK_DOWNLOAD_PATH ?= https://downloads.getmonero.org/depends-sources
+FALLBACK_DOWNLOAD_PATH ?= https://downloads.mevacoin.com/depends-sources
 
 C_STANDARD ?= c11
 CXX_STANDARD ?= c++17

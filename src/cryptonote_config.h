@@ -1,21 +1,21 @@
 // Copyright (c) 2014-2024, The Monero Project
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification, are
 // permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice, this list of
 //    conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list
 //    of conditions and the following disclaimer in the documentation and/or other
 //    materials provided with the distribution.
-// 
+//
 // 3. Neither the name of the copyright holder nor the names of its contributors may be
 //    used to endorse or promote products derived from this software without specific
 //    prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -25,7 +25,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
 // Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
 
 #pragma once
@@ -235,61 +235,56 @@ namespace config
   uint16_t const RPC_DEFAULT_PORT = 18081;
   uint16_t const ZMQ_RPC_DEFAULT_PORT = 18082;
   boost::uuids::uuid const NETWORK_ID = { {
-      0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99
-    } }; // Bender's nightmare
+      0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x11, 
+      0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99
+    } };
   std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302125fc635f8bfa8a40d2369704ddf914cc02aea88d4bb8af7cd1840dbc80c04a92101417d39b50624a496bfdf6a0c63f1901207cf37375f867d1a1a9681edceb6012e";
   uint32_t const GENESIS_NONCE = 10000;
-// Hash domain separators (prefisso meva_)
-const char HASH_KEY_BULLETPROOF_EXPONENT[] = "meva_bulletproof";
-const char HASH_KEY_BULLETPROOF_PLUS_EXPONENT[] = "meva_bulletproof_plus";
-const char HASH_KEY_BULLETPROOF_PLUS_TRANSCRIPT[] = "meva_bulletproof_plus_transcript";
-const char HASH_KEY_RINGDB[] = "meva_ringdsb";
-const char HASH_KEY_SUBADDRESS[] = "meva_SubAddr";
-const unsigned char HASH_KEY_ENCRYPTED_PAYMENT_ID = 0x8d;
-const unsigned char HASH_KEY_WALLET = 0x8c;
-const unsigned char HASH_KEY_WALLET_CACHE = 0x8d;
-const unsigned char HASH_KEY_BACKGROUND_CACHE = 0x8e;
-const unsigned char HASH_KEY_BACKGROUND_KEYS_FILE = 0x8f;
-const unsigned char HASH_KEY_RPC_PAYMENT_NONCE = 0x58;
-const unsigned char HASH_KEY_MEMORY = 'k';
-// 'meva_Multisig' padded with zeroes to match original array length (32 bytes)
-const unsigned char HASH_KEY_MULTISIG[] = {
-  'm','e','v','a','_','M','u','l','t','i','s','i','g',
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-};
-const unsigned char HASH_KEY_MULTISIG_KEY_AGGREGATION[] = "meva_Multisig_key_agg";
-const unsigned char HASH_KEY_CLSAG_ROUND_MULTISIG[] = "meva_CLSAG_round_ms_merge_factor";
-const unsigned char HASH_KEY_TXPROOF_V2[] = "meva_TXPROOF_V2";
-const unsigned char HASH_KEY_CLSAG_ROUND[] = "meva_CLSAG_round";
-const unsigned char HASH_KEY_CLSAG_AGG_0[] = "meva_CLSAG_agg_0";
-const unsigned char HASH_KEY_CLSAG_AGG_1[] = "meva_CLSAG_agg_1";
-const char HASH_KEY_MESSAGE_SIGNING[] = "meva_MevacoinMessageSignature";
-const unsigned char HASH_KEY_MM_SLOT = 'm';
-const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS_SEED[] = "meva_multisig_tx_privkeys_seed";
-const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS[] = "meva_multisig_tx_privkeys";
-const constexpr char HASH_KEY_TXHASH_AND_MIXRING[] = "meva_txhash_and_mixring";
+
+  // Hash domain separators - ORIGINALI DI MONERO (NON MODIFICARE!)
+  const char HASH_KEY_BULLETPROOF_EXPONENT[] = "bulletproof";
+  const char HASH_KEY_BULLETPROOF_PLUS_EXPONENT[] = "bulletproof_plus";
+  const char HASH_KEY_BULLETPROOF_PLUS_TRANSCRIPT[] = "bulletproof_plus_transcript";
+  const char HASH_KEY_RINGDB[] = "ringdsb";
+  const char HASH_KEY_SUBADDRESS[] = "SubAddr";
+  const unsigned char HASH_KEY_ENCRYPTED_PAYMENT_ID = 0x8d;
+  const unsigned char HASH_KEY_WALLET = 0x8c;
+  const unsigned char HASH_KEY_WALLET_CACHE = 0x8d;
+  const unsigned char HASH_KEY_BACKGROUND_CACHE = 0x8e;
+  const unsigned char HASH_KEY_BACKGROUND_KEYS_FILE = 0x8f;
+  const unsigned char HASH_KEY_RPC_PAYMENT_NONCE = 0x58;
+  const unsigned char HASH_KEY_MEMORY = 'k';
+  const unsigned char HASH_KEY_MULTISIG[] = {'M', 'u', 'l', 't' , 'i', 's', 'i', 'g', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+  const unsigned char HASH_KEY_MULTISIG_KEY_AGGREGATION[] = "Multisig_key_agg";
+  const unsigned char HASH_KEY_CLSAG_ROUND_MULTISIG[] = "CLSAG_round_ms_merge_factor";
+  const unsigned char HASH_KEY_TXPROOF_V2[] = "TXPROOF_V2";
+  const unsigned char HASH_KEY_CLSAG_ROUND[] = "CLSAG_round";
+  const unsigned char HASH_KEY_CLSAG_AGG_0[] = "CLSAG_agg_0";
+  const unsigned char HASH_KEY_CLSAG_AGG_1[] = "CLSAG_agg_1";
+  const char HASH_KEY_MESSAGE_SIGNING[] = "MoneroMessageSignature";
+  const unsigned char HASH_KEY_MM_SLOT = 'm';
+  const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS_SEED[] = "multisig_tx_privkeys_seed";
+  const constexpr char HASH_KEY_MULTISIG_TX_PRIVKEYS[] = "multisig_tx_privkeys";
+  const constexpr char HASH_KEY_TXHASH_AND_MIXRING[] = "txhash_and_mixring";
 
   // Multisig
   const uint32_t MULTISIG_MAX_SIGNERS{16};
 
   namespace testnet
-{
-  uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;
-  uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 54;
-  uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
-  uint16_t const P2P_DEFAULT_PORT = 28080;
-  uint16_t const RPC_DEFAULT_PORT = 28081;
-  uint16_t const ZMQ_RPC_DEFAULT_PORT = 28082;
-  boost::uuids::uuid const NETWORK_ID = { {
-      0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x11, 0x22,
-      0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA
-    } };
-  
-  // INSERISCI IL TUO GENESIS TX QUI
-  std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302c9653410fe03c7b136a1777e857b71693171733677b57f5fddae9ee1b77ec7502101beb93643458dfe7116701e141da83b3e73e83abd35d0aa2d1a65052481a6126c";
-  uint32_t const GENESIS_NONCE = 10001;  // NOTA: Usa 10001 come nei tuoi log!
-}
+  {
+    uint64_t const CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 53;
+    uint64_t const CRYPTONOTE_PUBLIC_INTEGRATED_ADDRESS_BASE58_PREFIX = 54;
+    uint64_t const CRYPTONOTE_PUBLIC_SUBADDRESS_BASE58_PREFIX = 63;
+    uint16_t const P2P_DEFAULT_PORT = 28080;
+    uint16_t const RPC_DEFAULT_PORT = 28081;
+    uint16_t const ZMQ_RPC_DEFAULT_PORT = 28082;
+    boost::uuids::uuid const NETWORK_ID = { {
+        0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x00, 0x11, 0x22,
+        0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA
+      } };
+    std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302c9653410fe03c7b136a1777e857b71693171733677b57f5fddae9ee1b77ec7502101beb93643458dfe7116701e141da83b3e73e83abd35d0aa2d1a65052481a6126c";
+    uint32_t const GENESIS_NONCE = 10001;
+  }
 
   namespace stagenet
   {
@@ -300,8 +295,9 @@ const constexpr char HASH_KEY_TXHASH_AND_MIXRING[] = "meva_txhash_and_mixring";
     uint16_t const RPC_DEFAULT_PORT = 38081;
     uint16_t const ZMQ_RPC_DEFAULT_PORT = 38082;
     boost::uuids::uuid const NETWORK_ID = { {
-        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x12
-      } }; // Bender's daydream
+        0x12 ,0x30, 0xF1, 0x71 , 0x61, 0x04 , 0x41, 0x61, 
+        0x17, 0x31, 0x00, 0x82, 0x16, 0xA1, 0xA1, 0x12
+      } };
     std::string const GENESIS_TX = "013c01ff0001ffffffffffff0302df5d56da0c7d643ddd1ce61901c7bdc5fb1738bfe39fbe69c28a3a7032729c0f2101168d0c4ca86fb55a4cf6a36d31431be1c53a3bd7411bb24e8832410289fa6f3b";
     uint32_t const GENESIS_NONCE = 10002;
   }
