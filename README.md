@@ -24,6 +24,7 @@ Mevacoin è una criptovaluta **privata, sicura e decentralizzata**.
 sudo apt update && sudo apt install build-essential cmake pkg-config libssl-dev libzmq3-dev libsodium-dev libunwind8-dev liblzma-dev libreadline-dev libexpat1-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev
 apt update && apt install -y libunbound-dev
 apt update && apt install -y libboost-all-dev
+apt install -y ccache
 ````
 
 ### Clonare il repository
