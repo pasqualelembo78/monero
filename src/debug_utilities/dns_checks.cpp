@@ -37,6 +37,15 @@
 #include "common/dns_utils.h"
 #include "version.h"
 
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <poll.h>
+#include <cstring>
+#include <chrono>
+
 #undef MONERO_DEFAULT_LOG_CATEGORY
 #define MONERO_DEFAULT_LOG_CATEGORY "debugtools.dnschecks"
 
@@ -44,55 +53,110 @@ namespace po = boost::program_options;
 
 enum lookup_t { LOOKUP_A, LOOKUP_TXT };
 
+/**
+ * Prova a connettersi TCP a ip:port con timeout (ms).
+ * Restituisce true se la connessione è stata stabilita.
+ */
+static bool probe_ip_port(const std::string &ip, int port, int timeout_ms = 2000)
+{
+  int fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (fd < 0)
+  {
+    MWARNING("socket() failed: " << strerror(errno));
+    return false;
+  }
+
+  // set non-blocking
+  int flags = fcntl(fd, F_GETFL, 0);
+  if (flags >= 0)
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+
+  sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(port);
+  if (inet_pton(AF_INET, ip.c_str(), &addr.sin_addr) != 1)
+  {
+    close(fd);
+    MWARNING("Invalid IP format: " << ip);
+    return false;
+  }
+
+  int rc = connect(fd, (sockaddr*)&addr, sizeof(addr));
+  if (rc == 0)
+  {
+    // immediate success
+    close(fd);
+    return true;
+  }
+  else if (errno != EINPROGRESS && errno != EWOULDBLOCK)
+  {
+    // immediate failure
+    close(fd);
+    return false;
+  }
+
+  // wait with poll
+  pollfd pfd;
+  pfd.fd = fd;
+  pfd.events = POLLOUT;
+  int pres = poll(&pfd, 1, timeout_ms);
+  if (pres <= 0)
+  {
+    close(fd);
+    return false;
+  }
+
+  // check for socket error
+  int so_error = 0;
+  socklen_t len = sizeof(so_error);
+  if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &so_error, &len) < 0)
+  {
+    close(fd);
+    return false;
+  }
+  close(fd);
+  return so_error == 0;
+}
+
+/**
+ * Esegue un controllo semplice su una lista di IP (porta P2P)
+ * e logga i risultati.
+ */
+static void check_seed_ips(const std::vector<std::string> &ips, int port = 18080)
+{
+  size_t reachable = 0;
+  for (const auto &ip : ips)
+  {
+    if (probe_ip_port(ip, port, 2000))
+    {
+      MINFO("Seed IP reachable: " << ip << ":" << port);
+      ++reachable;
+    }
+    else
+    {
+      MWARNING("Seed IP NOT reachable: " << ip << ":" << port);
+    }
+  }
+  if (reachable == ips.size())
+    MINFO(reachable << "/" << ips.size() << " seed IPs reachable");
+  else
+    MERROR(reachable << "/" << ips.size() << " seed IPs reachable");
+}
+
 static std::vector<std::string> lookup(lookup_t type, const char *hostname)
 {
-  bool dnssec_available = false, dnssec_valid = false;
-  std::vector<std::string> res;
-  switch (type)
-  {
-    case LOOKUP_A: res = tools::DNSResolver::instance().get_ipv4(hostname, dnssec_available, dnssec_valid); break;
-    case LOOKUP_TXT: res = tools::DNSResolver::instance().get_txt_record(hostname, dnssec_available, dnssec_valid); break;
-    default: MERROR("Invalid lookup type: " << (int)type); return {};
-  }
-  if (!dnssec_available)
-  {
-    MWARNING("No DNSSEC for " << hostname);
-    return {};
-  }
-  if (!dnssec_valid)
-  {
-    MWARNING("Invalid DNSSEC check for " << hostname);
-    return {};
-  }
-  MINFO(res.size() << " valid signed result(s) for " << hostname);
-  return res;
+  // Questa utility è stata adattata per usare controlli IP diretti.
+  // Manteniamo la funzione solo per compatibilità, ma in questa versione
+  // non la useremo per i TXT DNS perché abbiamo seed IP fissi.
+  return {};
 }
 
 static void lookup(lookup_t type, const std::vector<std::string> hostnames)
 {
-  std::vector<std::vector<std::string>> results;
-  for (const std::string &hostname: hostnames)
-  {
-    auto res = lookup(type, hostname.c_str());
-    if (!res.empty())
-    {
-      std::sort(res.begin(), res.end());
-      results.push_back(res);
-    }
-  }
-  std::map<std::vector<std::string>, size_t> counter;
-  for (const auto &e: results)
-    counter[e]++;
-  size_t count = 0;
-  for (const auto &e: counter)
-    count = std::max(count, e.second);
-  if (results.size() > 1)
-  {
-    if (count < results.size())
-      MERROR("Only " << count << "/" << results.size() << " records match");
-    else
-      MINFO(count << "/" << results.size() << " records match");
-  }
+  // non usata nella variante IP-direct
+  (void)type;
+  (void)hostnames;
 }
 
 int main(int argc, char* argv[])
@@ -129,20 +193,17 @@ int main(int argc, char* argv[])
   mlog_configure("", true);
   mlog_set_categories("+" MONERO_DEFAULT_LOG_CATEGORY ":INFO");
 
-  lookup(LOOKUP_A, {"seeds.moneroseeds.se", "seeds.moneroseeds.ae.org", "seeds.moneroseeds.ch", "seeds.moneroseeds.li"});
+  // --- Qui: elenco IP seed diretti per Mevacoin (porta P2P)
+  std::vector<std::string> seed_ips = {
+    
+    "87.106.40.193"
+  };
 
-  lookup(LOOKUP_TXT, {"updates.moneropulse.org", "updates.moneropulse.net", "updates.moneropulse.co", "updates.moneropulse.se", "updates.moneropulse.fr", "updates.moneropulse.de", "updates.moneropulse.ch"});
+  // Verifica reachability su porta 18080 (P2P)
+  check_seed_ips(seed_ips, 18080);
 
-  lookup(LOOKUP_TXT, {"checkpoints.moneropulse.org", "checkpoints.moneropulse.net", "checkpoints.moneropulse.co", "checkpoints.moneropulse.se"});
-
-  // those are in the code, but don't seem to actually exist
-#if 0
-  lookup(LOOKUP_TXT, {"testpoints.moneropulse.org", "testpoints.moneropulse.net", "testpoints.moneropulse.co", "testpoints.moneropulse.se");
-
-  lookup(LOOKUP_TXT, {"stagenetpoints.moneropulse.org", "stagenetpoints.moneropulse.net", "stagenetpoints.moneropulse.co", "stagenetpoints.moneropulse.se"});
-#endif
-
-  lookup(LOOKUP_TXT, {"segheights.moneropulse.org", "segheights.moneropulse.net", "segheights.moneropulse.co", "segheights.moneropulse.se"});
+  // Se vuoi aggiungere altri controlli (es. porte RPC), aggiungi qui, ad esempio:
+  // check_seed_ips(seed_ips, 18081); // controllo porta RPC (se esposta)
 
   return 0;
   CATCH_ENTRY_L0("main", 1);

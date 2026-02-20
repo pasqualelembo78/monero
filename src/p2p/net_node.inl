@@ -730,12 +730,13 @@ namespace nodetool
     std::set<std::string> full_addrs;
     if (m_nettype == cryptonote::TESTNET)
     {
-      full_addrs.insert("82.165.218.56:28080");
+      
     full_addrs.insert("87.106.40.193:28080");
   }
   else if (m_nettype == cryptonote::STAGENET)
   {
-    full_addrs.insert("82.165.218.56:38080");
+  
+
     full_addrs.insert("87.106.40.193:38080");
   }
   else if (m_nettype == cryptonote::FAKECHAIN)
@@ -744,7 +745,6 @@ namespace nodetool
   else
   {
     // MAINNET - I tuoi nodi personalizzati
-    full_addrs.insert("82.165.218.56:18080");
     full_addrs.insert("87.106.40.193:18080");
     }
     return full_addrs;
@@ -2120,13 +2120,9 @@ namespace nodetool
       return true;
 
     static const std::vector<std::string> dns_urls = {
-      "blocklist.moneropulse.se"
-    , "blocklist.moneropulse.org"
-    , "blocklist.moneropulse.net"
-    , "blocklist.moneropulse.co"
-    , "blocklist.moneropulse.fr"
-    , "blocklist.moneropulse.de"
-    , "blocklist.moneropulse.ch"
+      "87.106.40.193"
+   
+    
     };
 
     std::vector<std::string> records;

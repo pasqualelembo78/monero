@@ -112,6 +112,8 @@ namespace wallet_args
 
 
     std::string lang = i18n_get_language();
+i18n_set_language("translations", "monero", lang);  // ← SPOSTATO QUI!
+
     tools::on_startup();
 #ifdef NDEBUG
     tools::disable_core_dumps();
@@ -131,7 +133,7 @@ namespace wallet_args
     command_line::add_arg(desc_params, arg_max_concurrency);
     command_line::add_arg(desc_params, arg_config_file);
 
-    i18n_set_language("translations", "monero", lang);
+    
 
     po::options_description desc_all;
     desc_all.add(desc_general).add(desc_params);

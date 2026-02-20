@@ -1383,10 +1383,37 @@ namespace cryptonote
     return true;
   }
   //-----------------------------------------------------------------------------------------------
-  bool core::is_synchronized() const
+    bool core::is_synchronized() const
+{
+  // MEVACOIN FIX: Allow mining on test networks regardless of sync status
+  // This is essential for new blockchains with few nodes
+  if (m_nettype != MAINNET)
   {
-    return m_pprotocol != nullptr && m_pprotocol->is_synchronized();
+    MDEBUG("Mining allowed on non-mainnet (testnet/stagenet/fakechain)");
+    return true;
   }
+    
+  // MEVACOIN FIX: Allow mining if we're close to the target (within 10 blocks)
+  // This prevents mining from being blocked when a few blocks behind
+  if (m_target_blockchain_height > 0 && 
+      m_target_blockchain_height <= get_current_blockchain_height() + 10)
+  {
+    MDEBUG("Mining allowed: close to target (" << get_current_blockchain_height() 
+           << "/" << m_target_blockchain_height << ")");
+    return true;
+  }
+    
+  // MEVACOIN FIX: Allow mining if target is not set (no peers connected)
+  // This allows solo mining on a fresh blockchain
+  if (m_target_blockchain_height == 0)
+  {
+    MDEBUG("Mining allowed: no target height set (no peers or genesis block)");
+    return true;
+  }
+  
+  // Default Monero behavior: check protocol synchronization
+  return m_pprotocol != nullptr && m_pprotocol->is_synchronized();
+}
   //-----------------------------------------------------------------------------------------------
   void core::on_synchronized()
   {
@@ -1394,9 +1421,27 @@ namespace cryptonote
   }
   //-----------------------------------------------------------------------------------------------
   void core::safesyncmode(const bool onoff)
+{
+  // MEVACOIN FIX: Disable safe mode for new blockchains with few peers
+  // This allows mining even without full network synchronization
+  if (m_nettype != MAINNET)
   {
-    m_blockchain_storage.safesyncmode(onoff);
+    MDEBUG("Safe mode disabled on non-mainnet");
+    m_blockchain_storage.safesyncmode(false);
+    return;
   }
+  
+  // MEVACOIN FIX: Always disable safe mode if we're at genesis or very early blocks
+  if (get_current_blockchain_height() <= 100)
+  {
+    MDEBUG("Safe mode disabled: blockchain height <= 100");
+    m_blockchain_storage.safesyncmode(false);
+    return;
+  }
+  
+  // Default behavior for mainnet with established blockchain
+  m_blockchain_storage.safesyncmode(onoff);
+}
   //-----------------------------------------------------------------------------------------------
   bool core::add_new_block(const block& b, block_verification_context& bvc,
     pool_supplement& extra_block_txs)
