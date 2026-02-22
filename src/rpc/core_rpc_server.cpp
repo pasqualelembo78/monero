@@ -476,13 +476,17 @@ namespace cryptonote
 #define CHECK_PAYMENT_MIN1(req, res, payment, same_ts) do { if (!ctx || (m_rpc_payment_allow_free_loopback && ctx->m_remote_address.is_loopback())) break; uint64_t P = (uint64_t)payment; if (P == 0) P = 1; if(!check_payment(req.client, P, tracker.rpc_name(), same_ts, res.status, res.credits, res.top_hash)){return true;} tracker.pay(P); } while(0)
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::check_core_ready()
-  {
-    if(!m_p2p.get_payload_object().is_synchronized())
-    {
-      return false;
-    }
-    return true;
-  }
+{
+  const uint64_t height = m_core.get_current_blockchain_height();
+  const uint64_t target = m_core.get_target_blockchain_height();
+
+  // Rete normale (con target di sync)
+  if (target > 0)
+    return m_p2p.get_payload_object().is_synchronized();
+
+  // Rete nuova / privata (Mevacoin)
+  return height > 0;
+}
   //------------------------------------------------------------------------------------------------------------------------------
   bool core_rpc_server::add_host_fail(const connection_context *ctx, unsigned int score)
   {
