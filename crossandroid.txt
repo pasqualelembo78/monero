@@ -93,11 +93,30 @@ autoreconf -fi && \
   CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB && \
 make -j$(nproc) && make install
 ----
-git clone -b ${SODIUM_VERSION} https://github.com/jedisct1/libsodium.git
-cd libsodium
-./autogen.sh
-CC=clang CXX=clang++ ./configure --prefix=${PREFIX} --host=aarch64-linux-android --enable-static --disable-shared
-make -j${NPROC}
+Install libsodium
+
+cd /root/libsodium
+
+# Pulisci la compilazione precedente
+make distclean 2>/dev/null || true
+
+export NDK=/root/Android/Sdk/ndk/25.2.9519653
+export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
+export API=28
+
+export CC=$TOOLCHAIN/bin/aarch64-linux-android${API}-clang
+export AR=$TOOLCHAIN/bin/llvm-ar
+export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+export STRIP=$TOOLCHAIN/bin/llvm-strip
+
+./configure \
+  --host=aarch64-linux-android \
+  --prefix=/opt/sodium/android/arm64-v8a \
+  --disable-shared \
+  --enable-static \
+  --with-pic
+
+make -j$(nproc)
 make install
 ------
 
