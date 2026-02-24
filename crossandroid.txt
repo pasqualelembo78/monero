@@ -92,22 +92,27 @@ autoreconf -fi && \
   --with-libexpat=$EXPAT_DIR \
   CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB && \
 make -j$(nproc) && make install
+----
+git clone -b ${SODIUM_VERSION} https://github.com/jedisct1/libsodium.git
+cd libsodium
+./autogen.sh
+CC=clang CXX=clang++ ./configure --prefix=${PREFIX} --host=aarch64-linux-android --enable-static --disable-shared
+make -j${NPROC}
+make install
+------
+
+
 
 ---
 Installa immagine docker
 
-docker build --no-cache -t mevacoin-android -f Dockerfile.android . 
-
-Avvia installazione 
 docker run --rm -it \
   -v /root/mevacoin:/root/mevacoin \
-  -v /opt/boost/build/out/arm64-v8a/include:/opt/boost/include \
+  -v /opt/boost/build/out/arm64-v8a/include/boost-1_85:/opt/boost/include \
   -v /opt/boost/build/out/arm64-v8a/lib:/opt/boost/lib \
-  -w /root/mevacoin mevacoin-android bash -c "\
-    export BOOST_ROOT=/opt/boost && \
+  -w /root/mevacoin mevacoin-android bash -c "
     export OPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a && \
-    export UNBOUND_ROOT_DIR=/opt/unbound/android/arm64-v8a && \
-    export PKG_CONFIG_PATH=/opt/unbound/android/arm64-v8a/lib/pkgconfig:/opt/openssl/android/arm64-v8a/lib/pkgconfig:$PKG_CONFIG_PATH && \
+    export PKG_CONFIG_PATH=/opt/unbound/android/arm64-v8a/lib/pkgconfig:/opt/openssl/android/arm64-v8a/lib/pkgconfig:\$PKG_CONFIG_PATH && \
     mkdir -p build-android-so && cd build-android-so && \
     cmake .. \
       -DCMAKE_TOOLCHAIN_FILE=\$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
@@ -115,31 +120,25 @@ docker run --rm -it \
       -DANDROID_PLATFORM=android-28 \
       -DCMAKE_BUILD_TYPE=Release \
       -DBUILD_SHARED_LIBS=ON \
+      -DBoost_NO_SYSTEM_PATHS=ON \
+      -DBoost_NO_BOOST_CMAKE=ON \
+      -DBOOST_ROOT=/opt/boost \
+      -DBoost_INCLUDE_DIR=/opt/boost/include \
+      -DBoost_LIBRARY_DIR_RELEASE=/opt/boost/lib \
+      -DBoost_FILESYSTEM_LIBRARY_RELEASE=/opt/boost/lib/libboost_filesystem-clang-mt-a64-1_85.a \
+      -DBoost_THREAD_LIBRARY_RELEASE=/opt/boost/lib/libboost_thread-clang-mt-a64-1_85.a \
+      -DBoost_DATE_TIME_LIBRARY_RELEASE=/opt/boost/lib/libboost_date_time-clang-mt-a64-1_85.a \
+      -DBoost_CHRONO_LIBRARY_RELEASE=/opt/boost/lib/libboost_chrono-clang-mt-a64-1_85.a \
+      -DBoost_SERIALIZATION_LIBRARY_RELEASE=/opt/boost/lib/libboost_serialization-clang-mt-a64-1_85.a \
+      -DBoost_PROGRAM_OPTIONS_LIBRARY_RELEASE=/opt/boost/lib/libboost_program_options-clang-mt-a64-1_85.a \
+      -DBoost_REGEX_LIBRARY_RELEASE=/opt/boost/lib/libboost_regex-clang-mt-a64-1_85.a \
+      -DBoost_SYSTEM_LIBRARY_RELEASE=/opt/boost/lib/libboost_system-clang-mt-a64-1_85.a \
+      -DBoost_ATOMIC_LIBRARY_RELEASE=/opt/boost/lib/libboost_atomic-clang-mt-a64-1_85.a \
       -DOPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a \
       -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
       -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
       -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
-      -DUNBOUND_ROOT_DIR=/opt/unbound/android/arm64-v8a \
       -DUNBOUND_INCLUDE_DIR=/opt/unbound/android/arm64-v8a/include \
       -DUNBOUND_LIBRARY=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
-      -DUNBOUND_LIBRARIES=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
-      -G Ninja && \
-    ninja -j\$(nproc) && \
-    cd .. && \
-    mkdir -p build-android-a && cd build-android-a && \
-    cmake .. \
-      -DCMAKE_TOOLCHAIN_FILE=\$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
-      -DANDROID_ABI=arm64-v8a \
-      -DANDROID_PLATFORM=android-28 \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DBUILD_SHARED_LIBS=OFF \
-      -DOPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a \
-      -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
-      -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
-      -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
-      -DUNBOUND_ROOT_DIR=/opt/unbound/android/arm64-v8a \
-      -DUNBOUND_INCLUDE_DIR=/opt/unbound/android/arm64-v8a/include \
-      -DUNBOUND_LIBRARY=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
-      -DUNBOUND_LIBRARIES=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
       -G Ninja && \
     ninja -j\$(nproc)"
