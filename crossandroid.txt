@@ -1,0 +1,64 @@
+Ecco la procedura per cross android.
+
+------
+
+Openssl
+
+THREADS=16
+OPENSSL_VERSION=3.0.5
+OPENSSL_HASH=aa7d8d9bef71ad6525c55ba11e5f4397889ce49c2c9349dcea6d3e4f0b024a7a
+ANDROID_NDK_ROOT=/root/Android/Sdk/ndk/25.2.9519653
+PREFIX=/opt/openssl/android/arm64-v8a
+
+mkdir -p $PREFIX && cd /tmp \
+&& curl -LO https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
+&& echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c - \
+&& tar xf openssl-${OPENSSL_VERSION}.tar.gz \
+&& cd openssl-${OPENSSL_VERSION} \
+&& export PATH=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH \
+&& ./Configure android-arm64 \
+       -D__ANDROID_API__=28 \
+       -static \
+       no-shared no-tests \
+       --prefix=${PREFIX} --openssldir=${PREFIX} \
+&& make -j${THREADS} \
+&& make install_sw \
+&& rm -rf /tmp/openssl-${OPENSSL_VERSION}
+
+----
+
+
+docker run --rm -it \
+  -v /root/mevacoin:/root/mevacoin \
+  -v /opt/boost/build/out/arm64-v8a/include:/opt/boost/include \
+  -v /opt/boost/build/out/arm64-v8a/lib:/opt/boost/lib \
+  -w /root/mevacoin mevacoin-android bash -c "\
+    export BOOST_ROOT=/opt/boost && \
+    export OPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a && \
+    mkdir -p build-android-so && cd build-android-so && \
+    cmake .. \
+      -DCMAKE_TOOLCHAIN_FILE=\$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+      -DANDROID_ABI=arm64-v8a \
+      -DANDROID_PLATFORM=android-28 \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=ON \
+      -DOPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a \
+      -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
+      -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
+      -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
+      -G Ninja && \
+    ninja -j\$(nproc) && \
+    cd .. && \
+    mkdir -p build-android-a && cd build-android-a && \
+    cmake .. \
+      -DCMAKE_TOOLCHAIN_FILE=\$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+      -DANDROID_ABI=arm64-v8a \
+      -DANDROID_PLATFORM=android-28 \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DOPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a \
+      -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
+      -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
+      -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
+      -G Ninja && \
+    ninja -j\$(nproc)"
