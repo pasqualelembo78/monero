@@ -26,6 +26,74 @@ mkdir -p $PREFIX && cd /tmp \
 && rm -rf /tmp/openssl-${OPENSSL_VERSION}
 
 ----
+
+Installa expat
+
+# Variabili principali
+export NDK=/root/Android/Sdk/ndk/25.2.9519653
+export API=28
+export TARGET=aarch64-linux-android
+export PREFIX=/opt/expat/android/arm64-v8a
+export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
+export PATH=$TOOLCHAIN/bin:$PATH
+export CC=$TOOLCHAIN/bin/${TARGET}${API}-clang
+export CXX=$TOOLCHAIN/bin/${TARGET}${API}-clang++
+export AR=$TOOLCHAIN/bin/llvm-ar
+export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+export THREADS=16
+
+# Comando unico
+mkdir -p $PREFIX && cd /tmp && \
+wget https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz && \
+tar xf expat-2.5.0.tar.gz && cd expat-2.5.0 && \
+./configure --host=aarch64-linux-android --prefix=$PREFIX --enable-static --disable-shared \
+            CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB && \
+make -j$THREADS && \
+make install && \
+rm -rf /tmp/expat-2.5.0 /tmp/expat-2.5.0.tar.gz
+
+
+----(
+Install libunbound (dopo openssl) 
+export NDK=/root/Android/Sdk/ndk/25.2.9519653 \
+API=28 \
+TARGET=aarch64-linux-android \
+OPENSSL_DIR=/opt/openssl/android/arm64-v8a \
+EXPAT_DIR=/opt/expat/android/arm64-v8a \
+PREFIX=/opt/unbound/android/arm64-v8a \
+TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64 && \
+export CC=$TOOLCHAIN/bin/${TARGET}${API}-clang \
+CXX=$TOOLCHAIN/bin/${TARGET}${API}-clang++ \
+AR=$TOOLCHAIN/bin/llvm-ar \
+RANLIB=$TOOLCHAIN/bin/llvm-ranlib \
+PATH=$TOOLCHAIN/bin:$PATH && \
+apt update && apt install -y git autoconf automake libtool pkg-config make perl wget && \
+# ================== installa expat ==================
+mkdir -p $EXPAT_DIR && cd /tmp && \
+wget https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz && \
+tar xf expat-2.5.0.tar.gz && cd expat-2.5.0 && \
+./configure --host=aarch64-linux-android --prefix=$EXPAT_DIR --enable-static --disable-shared \
+            CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB && \
+make -j$(nproc) && make install && \
+rm -rf /tmp/expat-2.5.0 /tmp/expat-2.5.0.tar.gz && \
+# ================== installa Unbound ==================
+cd /usr/src && rm -rf unbound && \
+git clone https://github.com/NLnetLabs/unbound.git -b release-1.16.1 && \
+cd unbound && \
+test "$(git rev-parse HEAD)" = "903538c76e1d8eb30d0814bb55c3ef1ea28164e8" && \
+autoreconf -fi && \
+./configure \
+  --host=aarch64-linux-android \
+  --prefix=$PREFIX \
+  --enable-static \
+  --disable-shared \
+  --disable-flto \
+  --with-ssl=$OPENSSL_DIR \
+  --with-libexpat=$EXPAT_DIR \
+  CC=$CC CXX=$CXX AR=$AR RANLIB=$RANLIB && \
+make -j$(nproc) && make install
+
+---
 Installa immagine docker
 
 docker build --no-cache -t mevacoin-android -f Dockerfile.android . 
