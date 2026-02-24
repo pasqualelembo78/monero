@@ -26,7 +26,11 @@ mkdir -p $PREFIX && cd /tmp \
 && rm -rf /tmp/openssl-${OPENSSL_VERSION}
 
 ----
+Installa immagine docker
 
+docker build --no-cache -t mevacoin-android -f Dockerfile.android . 
+
+Avvia installazione 
 
 docker run --rm -it \
   -v /root/mevacoin:/root/mevacoin \
