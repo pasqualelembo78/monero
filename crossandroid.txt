@@ -99,7 +99,6 @@ Installa immagine docker
 docker build --no-cache -t mevacoin-android -f Dockerfile.android . 
 
 Avvia installazione 
-
 docker run --rm -it \
   -v /root/mevacoin:/root/mevacoin \
   -v /opt/boost/build/out/arm64-v8a/include:/opt/boost/include \
@@ -108,6 +107,7 @@ docker run --rm -it \
     export BOOST_ROOT=/opt/boost && \
     export OPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a && \
     export UNBOUND_ROOT_DIR=/opt/unbound/android/arm64-v8a && \
+    export PKG_CONFIG_PATH=/opt/unbound/android/arm64-v8a/lib/pkgconfig:/opt/openssl/android/arm64-v8a/lib/pkgconfig:$PKG_CONFIG_PATH && \
     mkdir -p build-android-so && cd build-android-so && \
     cmake .. \
       -DCMAKE_TOOLCHAIN_FILE=\$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
@@ -119,8 +119,10 @@ docker run --rm -it \
       -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
       -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
       -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
+      -DUNBOUND_ROOT_DIR=/opt/unbound/android/arm64-v8a \
       -DUNBOUND_INCLUDE_DIR=/opt/unbound/android/arm64-v8a/include \
       -DUNBOUND_LIBRARY=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
+      -DUNBOUND_LIBRARIES=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
       -G Ninja && \
     ninja -j\$(nproc) && \
     cd .. && \
@@ -135,7 +137,9 @@ docker run --rm -it \
       -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
       -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
       -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
+      -DUNBOUND_ROOT_DIR=/opt/unbound/android/arm64-v8a \
       -DUNBOUND_INCLUDE_DIR=/opt/unbound/android/arm64-v8a/include \
       -DUNBOUND_LIBRARY=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
+      -DUNBOUND_LIBRARIES=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
       -G Ninja && \
     ninja -j\$(nproc)"
