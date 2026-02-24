@@ -107,6 +107,7 @@ docker run --rm -it \
   -w /root/mevacoin mevacoin-android bash -c "\
     export BOOST_ROOT=/opt/boost && \
     export OPENSSL_ROOT_DIR=/opt/openssl/android/arm64-v8a && \
+    export UNBOUND_ROOT_DIR=/opt/unbound/android/arm64-v8a && \
     mkdir -p build-android-so && cd build-android-so && \
     cmake .. \
       -DCMAKE_TOOLCHAIN_FILE=\$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
@@ -118,6 +119,8 @@ docker run --rm -it \
       -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
       -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
       -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
+      -DUNBOUND_INCLUDE_DIR=/opt/unbound/android/arm64-v8a/include \
+      -DUNBOUND_LIBRARY=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
       -G Ninja && \
     ninja -j\$(nproc) && \
     cd .. && \
@@ -132,5 +135,7 @@ docker run --rm -it \
       -DOPENSSL_INCLUDE_DIR=/opt/openssl/android/arm64-v8a/include \
       -DOPENSSL_CRYPTO_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libcrypto.a \
       -DOPENSSL_SSL_LIBRARY=/opt/openssl/android/arm64-v8a/lib/libssl.a \
+      -DUNBOUND_INCLUDE_DIR=/opt/unbound/android/arm64-v8a/include \
+      -DUNBOUND_LIBRARY=/opt/unbound/android/arm64-v8a/lib/libunbound.a \
       -G Ninja && \
     ninja -j\$(nproc)"
