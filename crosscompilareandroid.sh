@@ -108,7 +108,108 @@ installa libsodium
 mkdir /root/libsodium
 cd /root/libsodium
 make distclean || truecmake .. \
-  
+  Install libsodium
+
+cd /root/libsodium
+
+# Pulisci la compilazione precedente
+make distclean 2>/dev/null || true
+
+export ANDROID_NDK=/root/Android/android-ndk-r26b
+export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
+export TARGET=aarch64-linux-android24
+
+export CC=$TOOLCHAIN/bin/$TARGET-clang
+export CXX=$TOOLCHAIN/bin/$TARGET-clang++
+export AR=$TOOLCHAIN/bin/llvm-ar
+export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+export STRIP=$TOOLCHAIN/bin/llvm-strip
+
+export CFLAGS="--target=$TARGET --sysroot=$TOOLCHAIN/sysroot"
+export CXXFLAGS="--target=$TARGET --sysroot=$TOOLCHAIN/sysroot"
+export LDFLAGS="--target=$TARGET --sysroot=$TOOLCHAIN/sysroot"
+
+./configure \
+  --host=aarch64-linux-android \
+  --prefix=/opt/libsodium/android/arm64-v8a \
+  --enable-static \
+  --disable-shared
+
+make -j$(nproc)
+make install
+
+ # ho notato che il file finsodium.cmake nella cartella /mevacoin/cmake ha dei problemi.
+sostituisci completametne il suot contenuto. usa questo per farlo:
+
+cat > ~/mevacoin/cmake/FindSodium.cmake << 'EOF'
+# FindSodium.cmake - versione per cross-compilation Android
+
+if (NOT DEFINED sodium_USE_STATIC_LIBS)
+    option(sodium_USE_STATIC_LIBS "enable to statically link against sodium" OFF)
+endif()
+
+# SOLO_HOST evita che il toolchain Android reindirizzi nel sysroot NDK
+find_path(sodium_INCLUDE_DIR sodium.h
+    HINTS ${sodium_DIR}/include
+    NO_DEFAULT_PATH
+    NO_CMAKE_FIND_ROOT_PATH
+)
+
+if(sodium_USE_STATIC_LIBS)
+    find_library(sodium_LIBRARY_RELEASE libsodium.a
+        HINTS ${sodium_DIR}/lib
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+    find_library(sodium_LIBRARY_DEBUG libsodium.a
+        HINTS ${sodium_DIR}/lib
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+else()
+    find_library(sodium_LIBRARY_RELEASE sodium
+        HINTS ${sodium_DIR}/lib
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+    find_library(sodium_LIBRARY_DEBUG sodium
+        HINTS ${sodium_DIR}/lib
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+endif()
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(Sodium
+    REQUIRED_VARS
+        sodium_LIBRARY_RELEASE
+        sodium_LIBRARY_DEBUG
+        sodium_INCLUDE_DIR
+)
+
+if(Sodium_FOUND)
+    set(sodium_LIBRARIES optimized ${sodium_LIBRARY_RELEASE} debug ${sodium_LIBRARY_DEBUG})
+    if(NOT TARGET sodium)
+        if(sodium_USE_STATIC_LIBS)
+            add_library(sodium STATIC IMPORTED)
+            set_target_properties(sodium PROPERTIES
+                INTERFACE_COMPILE_DEFINITIONS "SODIUM_STATIC"
+            )
+        else()
+            add_library(sodium SHARED IMPORTED)
+        endif()
+        set_target_properties(sodium PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${sodium_INCLUDE_DIR}"
+            IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+            IMPORTED_LOCATION "${sodium_LIBRARY_RELEASE}"
+            IMPORTED_LOCATION_DEBUG "${sodium_LIBRARY_DEBUG}"
+        )
+    endif()
+endif()
+
+mark_as_advanced(sodium_INCLUDE_DIR sodium_LIBRARY_DEBUG sodium_LIBRARY_RELEASE)
+EOF
+
 
 
 
