@@ -226,6 +226,20 @@ make -j$(nproc)
 ls -la generate_translations_header ImportExecutables.cmake
 file generate_translations_header
 ------------
+Modifica cmakelist per evitare errori 
+cp ~/mevacoin/CMakeLists.txt ~/mevacoin/CMakeLists.txt.bak
+
+sed -i 's|CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH}|CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH} -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=x86_64|' ~/mevacoin/CMakeLists.txt
+
+# Verifica
+sed -n '641,650p' ~/mevacoin/CMakeLists.txt
+```
+
+Dovresti vedere:
+```
+CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH} -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=x86_64
+
+----
 cd mevacoin
 mkdir build-android
 cd build-android
