@@ -212,32 +212,21 @@ EOF
 
 
 —------
-
-# 1. Crea una build nativa x86_64 SOLO per le translations
-cd ~/mevacoin
-mkdir -p build-native-translations && cd build-native-translations
-
-cmake ../translations \
-  -DCMAKE_BUILD_TYPE=Release
-
+git clone https://github.com/zeromq/libzmq.git
+cd libzmq
+mkdir build-android && cd build-android
+cmake .. \
+  -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+  -DANDROID_ABI=arm64-v8a \
+  -DANDROID_PLATFORM=android-24 \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_SHARED=OFF \
+  -DENABLE_DRAFTS=OFF \
+  -DWITH_LIBBSD=OFF \
+  -DBUILD_TESTS=OFF \
+  -DCMAKE_INSTALL_PREFIX=/opt/zmq/android/arm64-v8a
 make -j$(nproc)
-
-# Verifica che abbia generato il file ImportExecutables.cmake e il binario x86_64
-ls -la generate_translations_header ImportExecutables.cmake
-file generate_translations_header
-------------
-Modifica cmakelist per evitare errori 
-cp ~/mevacoin/CMakeLists.txt ~/mevacoin/CMakeLists.txt.bak
-
-sed -i 's|CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH}|CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH} -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=x86_64|' ~/mevacoin/CMakeLists.txt
-
-# Verifica
-sed -n '641,650p' ~/mevacoin/CMakeLists.txt
-```
-
-Dovresti vedere:
-```
-CMAKE_ARGS -DLRELEASE_PATH=${LRELEASE_PATH} -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=x86_64
+make install
 
 ----
 cd mevacoin
