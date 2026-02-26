@@ -277,4 +277,8 @@ cmake .. \
   -Dsodium_LIBRARY_DEBUG=/opt/libsodium/android/arm64-v8a/lib/libsodium.a \
   -DENABLE_UNBOUND=ON \
   -DENABLE_HIDAPI=OFF \
-  -DIMPORT_EXECUTABLES=/root/mevacoin/build-native-translations/ImportExecutables.cmake
+  -DIMPORT_EXECUTABLES=/root/mevacoin/build-native-translations/ImportExecutables.cmake \
+  -DZMQ_INCLUDE_DIR=/opt/zmq/android/arm64-v8a/include \
+  -DZMQ_LIBRARY=/opt/zmq/android/arm64-v8a/lib/libzmq.a \
+  -DCMAKE_C_FLAGS="-I/opt/libsodium/android/arm64-v8a/include -I/opt/zmq/android/arm64-v8a/include" \
+  -DCMAKE_CXX_FLAGS="-I/opt/libsodium/android/arm64-v8a/include -I/opt/zmq/android/arm64-v8a/include"
