@@ -211,8 +211,20 @@ mark_as_advanced(sodium_INCLUDE_DIR sodium_LIBRARY_DEBUG sodium_LIBRARY_RELEASE)
 EOF
 
 
+—------
 
+# 1. Crea una build nativa x86_64 SOLO per le translations
+cd ~/mevacoin
+mkdir -p build-native-translations && cd build-native-translations
 
+cmake ../translations \
+  -DCMAKE_BUILD_TYPE=Release
+
+make -j$(nproc)
+
+# Verifica che abbia generato il file ImportExecutables.cmake e il binario x86_64
+ls -la generate_translations_header ImportExecutables.cmake
+file generate_translations_header
 ------------
 cd mevacoin
 mkdir build-android
@@ -234,11 +246,21 @@ cmake .. \
   -DBOOST_ROOT=/opt/boost/build/out/arm64-v8a \
   -DBoost_INCLUDE_DIR=/opt/boost/build/out/arm64-v8a/include/boost-1_85 \
   -DBoost_LIBRARY_DIR=/opt/boost/build/out/arm64-v8a/lib \
+  -DBoost_FILESYSTEM_LIBRARY_RELEASE=/opt/boost/build/out/arm64-v8a/lib/libboost_filesystem-clang-mt-a64-1_85.a \
+  -DBoost_THREAD_LIBRARY_RELEASE=/opt/boost/build/out/arm64-v8a/lib/libboost_thread-clang-mt-a64-1_85.a \
+  -DBoost_DATE_TIME_LIBRARY_RELEASE=/opt/boost/build/out/arm64-v8a/lib/libboost_date_time-clang-mt-a64-1_85.a \
+  -DBoost_CHRONO_LIBRARY_RELEASE=/opt/boost/build/out/arm64-v8a/lib/libboost_chrono-clang-mt-a64-1_85.a \
+  -DBoost_SERIALIZATION_LIBRARY_RELEASE=/opt/boost/build/out/arm64-v8a/lib/libboost_serialization-clang-mt-a64-1_85.a \
+  -DBoost_PROGRAM_OPTIONS_LIBRARY_RELEASE=/opt/boost/build/out/arm64-v8a/lib/libboost_program_options-clang-mt-a64-1_85.a \
+  -DBoost_ATOMIC_LIBRARY_RELEASE=/opt/boost/build/out/arm64-v8a/lib/libboost_atomic-clang-mt-a64-1_85.a \
   -DBoost_USE_STATIC_LIBS=ON \
   -DBoost_USE_MULTITHREADED=ON \
   -DBoost_NO_SYSTEM_PATHS=ON \
   -DBoost_NO_BOOST_CMAKE=ON \
   -Dsodium_USE_STATIC_LIBS=ON \
-  -Dsodium_DIR=/opt/libsodium/android/arm64-v8a \
+  -Dsodium_INCLUDE_DIR=/opt/libsodium/android/arm64-v8a/include \
+  -Dsodium_LIBRARY_RELEASE=/opt/libsodium/android/arm64-v8a/lib/libsodium.a \
+  -Dsodium_LIBRARY_DEBUG=/opt/libsodium/android/arm64-v8a/lib/libsodium.a \
   -DENABLE_UNBOUND=ON \
   -DENABLE_HIDAPI=OFF \
+  -DIMPORT_EXECUTABLES=/root/mevacoin/build-native-translations/ImportExecutables.cmake
