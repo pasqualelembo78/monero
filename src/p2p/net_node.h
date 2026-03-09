@@ -301,13 +301,17 @@ namespace nodetool
     virtual void clear_used_stripe_peers();
 
   private:
+    // Lista dei seed nodes per fallback, usa i tuoi DNS appena creati
     const std::vector<std::string> m_seed_nodes_list =
-    { "82.165.218.56"
-    , "87.106.40.193"
+    {
+        "seed1.mevacoin.com",
+        "seed2.mevacoin.com",
+        "seed3.mevacoin.com"
     };
 
-    bool islimitup=false;
-    bool islimitdown=false;
+    // Flag di limite banda (false = non impostati)
+    bool islimitup = false;
+    bool islimitdown = false;
 
     CHAIN_LEVIN_INVOKE_MAP2(p2p_connection_context); //move levin_commands_handler interface invoke(...) callbacks into invoke map
     CHAIN_LEVIN_NOTIFY_MAP2(p2p_connection_context); //move levin_commands_handler interface notify(...) callbacks into nothing
