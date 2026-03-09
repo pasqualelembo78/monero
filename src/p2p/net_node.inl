@@ -725,30 +725,38 @@ namespace nodetool
 
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
-  std::set<std::string> node_server<t_payload_net_handler>::get_ip_seed_nodes() const
-  {
+std::set<std::string> node_server<t_payload_net_handler>::get_ip_seed_nodes() const
+{
     std::set<std::string> full_addrs;
+
     if (m_nettype == cryptonote::TESTNET)
     {
-      
-    full_addrs.insert("87.106.40.193:28080");
-  }
-  else if (m_nettype == cryptonote::STAGENET)
-  {
-  
-
-    full_addrs.insert("87.106.40.193:38080");
-  }
-  else if (m_nettype == cryptonote::FAKECHAIN)
-  {
-  }
-  else
-  {
-    // MAINNET - I tuoi nodi personalizzati
-    full_addrs.insert("87.106.40.193:18080");
+        // Seed nodes testnet
+        full_addrs.insert("seed1.mevacoin.com:28080");
+        full_addrs.insert("seed2.mevacoin.com:28080");
+        full_addrs.insert("seed3.mevacoin.com:28080");
     }
+    else if (m_nettype == cryptonote::STAGENET)
+    {
+        // Seed nodes stagenet
+        full_addrs.insert("seed1.mevacoin.com:38080");
+        full_addrs.insert("seed2.mevacoin.com:38080");
+        full_addrs.insert("seed3.mevacoin.com:38080");
+    }
+    else if (m_nettype == cryptonote::FAKECHAIN)
+    {
+        // Fakechain rimane vuoto oppure aggiungi seed locali se vuoi
+    }
+    else
+    {
+        // MAINNET - Seed nodes principali
+        full_addrs.insert("seed1.mevacoin.com:18080");
+        full_addrs.insert("seed2.mevacoin.com:18080");
+        full_addrs.insert("seed3.mevacoin.com:18080");
+    }
+
     return full_addrs;
-  }
+}
   //-----------------------------------------------------------------------------------
   template<class t_payload_net_handler>
   std::set<std::string> node_server<t_payload_net_handler>::get_dns_seed_nodes()
@@ -2120,7 +2128,7 @@ namespace nodetool
       return true;
 
     static const std::vector<std::string> dns_urls = {
-      "87.106.40.193"
+      "blocklist.mevacoin.com"
    
     
     };
