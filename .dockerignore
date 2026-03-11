@@ -1,1 +1,3 @@
-*
+!build-android.sh
+!android-keystore/
+!android-keystore/monero-release.keystore 

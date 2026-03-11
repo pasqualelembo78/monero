@@ -1,6 +1,6 @@
-[submodule "monero"]
-	path = monero
-	url = https://github.com/monero-project/monero
+ [submodule "mevacoin"]
+	path = mevacoin 
+	url = https://github.com/pasqualelembo78/mevacoin 
 	ignore = all
 [submodule "external/quirc"]
 	path = external/quirc
